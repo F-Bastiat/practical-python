@@ -2,7 +2,12 @@
 #
 # Exercise 1.7
 from datetime import datetime as dt
+import pandas as pd
+from tabulate import tabulate
 from dateutil.relativedelta import relativedelta as rd
+
+pd.options.display.float_format = '{:,.2f}'.format
+pd.options.display.width = 0
 
 
 month = dt.strptime('2021-11-03', '%Y-%m-%d')
@@ -13,25 +18,36 @@ periods = 360
 insurance_rate = 0.0035
 payment_after_7 = 2681.27
 extra_payment_calendar = [
-    {'from_month': 2, 'to_month': 2, 'extra': 10000},
-    {'from_month': 3, 'to_month': 12, 'extra': 15000},
-    {'from_month': 13, 'to_month': 24, 'extra': 18000},
-    {'from_month': 25, 'to_month': 360, 'extra': 20000}
+    {'from_month': 2, 'to_month': 2, 'extra': 10000.0},
+    {'from_month': 3, 'to_month': 12, 'extra': 15000.0},
+    {'from_month': 13, 'to_month': 24, 'extra': 18000.0},
+    {'from_month': 25, 'to_month': 360, 'extra': 20000.0}
 ]
 extra_payment = 0.0
 bonus_calendar = [
-    {'month': 2, 'bonus': 35000},
-    {'month': 9, 'bonus': 30000},
-    {'month': 21, 'bonus': 35000},
-    {'month': 33, 'bonus': 40000}
+    {'month': 2, 'bonus': 35000.0},
+    {'month': 9, 'bonus': 30000.0},
+    {'month': 21, 'bonus': 35000.0},
+    {'month': 33, 'bonus': 40000.0}
 ]
 bonus = 0.0
 total_paid = 0.0
 period = 0
+cols=['Mon', 'Rate', 'Extra', 'Bonus', 'Payment', 'Interest', 'Principal rate', 'Total paid', 'Principal']
+df = pd.DataFrame(columns=cols)
 
-print (f'{"Nr":>3} {"Mon":>10} {"Rate":>12} {"Extra":>12} {"Bonus":>12} {"Payment":>12} {"Interest":>12} {"Princip.rate":>12} {"Total paid":>12} {"Principal":>12}')
-print('----------------------------------------------------------------------------------------------------------------------')
-print(f'{period:>3} {month:%Y-%m-%d} {0:>12,.2f} {0:>12,.2f} {0:>12,} {0:>12,.2f} {0:>12,.2f} {0:>12,.2f} {total_paid:>12,.2f} {principal:>12,.2f}')
+df = df.append({
+        # 'Nr': period,
+        'Mon': dt.strftime(month, '%Y-%m-%d'),
+        'Rate': 0.0,
+        'Extra': 0.0,
+        'Bonus': 0.0,
+        'Payment': 0.0,
+        'Interest': 0.0,
+        'Principal rate': 0.0,
+        'Total paid': total_paid,
+        'Principal': principal
+    }, ignore_index=True)
 
 for period in range(periods):
     if principal > 0:
@@ -69,7 +85,23 @@ for period in range(periods):
     principal = principal - principal_rate - extra_payment - bonus
     total_paid = total_paid + current_payment
     
-    print(f'{period:>3} {month:%Y-%m-%d} {payment:>12,.2f} {extra_payment:>12,.2f} {bonus:>12,.2f} {current_payment:>12,.2f} {interest:>12,.2f} {principal_rate:>12,.2f} {total_paid:>12,.2f} {principal:>12,.2f}')
+    df = df.append({
+        # 'Nr': period,
+        'Mon': dt.strftime(month, '%Y-%m-%d'),
+        'Rate': payment,
+        'Extra': extra_payment,
+        'Bonus': bonus,
+        'Payment': current_payment,
+        'Interest': interest,
+        'Principal rate': principal_rate,
+        'Total paid': total_paid,
+        'Principal': principal
+    }, ignore_index=True)
 
-print('======================================================================================================================')
 print(f'Total paid: {total_paid:>16,.2f}\nCredit cost: {total_paid - _principal:>15,.2f}\nMonths: {period:>17}')
+
+df.to_csv('Scadentar_Credit.csv')
+df.to_excel('Scadentar_Credit.xlsx')
+
+print(df)
+# print(tabulate(df, headers=cols, tablefmt='psql'))

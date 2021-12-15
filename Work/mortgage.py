@@ -5,35 +5,40 @@ from datetime import datetime as dt
 from dateutil.relativedelta import relativedelta as rd
 
 
-month = dt.strptime('2021-11-03', '%Y-%m-%d')
-principal = 552253.0
+month = dt.strptime('2021-10-03', '%Y-%m-%d')
+advance_m = 80000
+advance_f = 50500
+advance =  advance_m + advance_f
+principal = 576100.0
 _principal = principal
 rate = 0.0449
 periods = 360
 insurance_rate = 0.0035
 payment_after_7 = 2681.27
 extra_payment_cal_m = [
-    {'from_month': 1, 'to_month': 1, 'extra': 5000},
+    {'from_month': 1, 'to_month': 1, 'extra': 0},
     {'from_month': 3, 'to_month': 12, 'extra': 10000},
     {'from_month': 13, 'to_month': 24, 'extra': 10000},
     {'from_month': 25, 'to_month': 360, 'extra': 12000}
 ]
 extra_payment_cal_f = [
-    {'from_month': 1, 'to_month': 1, 'extra': 5000},
-    {'from_month': 2, 'to_month': 2, 'extra': 7000},
+    {'from_month': 1, 'to_month': 1, 'extra': 0},
     {'from_month': 3, 'to_month': 12, 'extra': 5000},
     {'from_month': 13, 'to_month': 24, 'extra': 5000},
     {'from_month': 25, 'to_month': 360, 'extra': 6000}
 ]
 extra_payment = 0.0
 bonus_cal_m = [
-    {'month': 2, 'bonus': 55000},
-    {'month': 13, 'bonus': 20000}
+    {'month': 2, 'bonus': 25000},
+    {'month': 5, 'bonus': 20000},
+    {'month': 15, 'bonus': 20000}
 ]
 bonus_cal_f = [
-    {'month': 9, 'bonus': 30000},
-    {'month': 21, 'bonus': 35000},
-    {'month': 33, 'bonus': 40000}
+    {'month': 1, 'bonus': 21000},
+    {'month': 2, 'bonus': 10000},
+    {'month': 10, 'bonus': 40000},
+    {'month': 22, 'bonus': 40000},
+    {'month': 34, 'bonus': 40000}
 ]
 bonus = 0.0
 total_paid_m = 0.0
@@ -61,7 +66,7 @@ for period in range(periods):
     interest = principal * rate / 12
 
     if period == 1:
-        interest = 1807.9
+        interest = 139.07
     elif period == 85:
         interest = 1519.02
     else: 
@@ -105,6 +110,6 @@ print(f'Total paid: {total_paid:>16,.2f}')
 print(f'Credit cost: {total_paid - _principal:>15,.2f}')
 print(f'Months: {period:>17}')
 print(f'Total rates: {total_rates:>15,.2f}')
-print(f'Total paid M: {total_paid_m:>14,.2f} | {total_paid_m / total_paid:.2%}')
-print(f'Total paid F: {total_paid_f:>14,.2f} | {total_paid_f / total_paid:.2%}')
-print(f'Outstanding: {(max(total_paid_m, total_paid_f) - min(total_paid_m, total_paid_f))/2:>15,.2f}')
+print(f'Total paid M: {total_paid_m+advance_m:>14,.2f} | {(total_paid_m+advance_m) / (total_paid+advance):.2%}')
+print(f'Total paid F: {total_paid_f+advance_f:>14,.2f} | {(total_paid_f+advance_f) / (total_paid+advance):.2%}')
+print(f'Outstanding: {(max(total_paid_m+advance_m, total_paid_f+advance_f) - min(total_paid_m+advance_m, total_paid_f+advance_f))/2:>15,.2f}')

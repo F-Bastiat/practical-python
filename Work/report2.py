@@ -1,55 +1,27 @@
+#!/usr/local/bin/python python3
 # report.py
 #
 # Exercise 2.4
-import csv
 from pprint import pprint
+from fileparse import parse_csv
 
 def read_portfolio_tuple(filename):
-    '''Read file into a list of tuples'''
-    portfolio = []
-
-    with open(filename, 'rt') as f:
-        rows = csv.reader(f)
-        headers = next(rows)
-        for row in rows:
-            try:
-                holding = (row[0], int(row[1]), float(row[2]))
-                portfolio.append(holding)
-            except:
-                TypeError(f'Incorrect data type on row:\n{row}')
+    '''Read a file into a list of tuples'''
+    portfolio = parse_csv(filename, select=[0, 1, 2], types=[str, int, float], has_headers=False)
     return portfolio
 
 
 def read_portfolio_dict(filename):
     '''Read file into a list of dictionaries'''
-    portfolio = []
-
-    with open(filename, 'rt') as f:
-        rows = csv.reader(f)
-        headers = next(rows)
-        for i, row in enumerate(rows):
-            holding = dict(zip(headers, row))
-            try:
-                holding['shares'] = int(holding['shares'])
-                holding['price'] = float(holding['price'])
-                portfolio.append(holding)
-            except:
-                TypeError(f'Incorrect data type on row {i}:\n{row}')
+    portfolio = parse_csv(filename, select=['name', 'shares', 'price'], types=[str, int, float])
     return portfolio
 
 
 def read_prices(filename):
     '''Read file into a dictionary'''
-    prices = {}
-
-    with open(filename, 'rt') as f:
-        rows = csv.reader(f)
-        for row in rows:
-            try:
-                prices[row[0]] = float(row[1])
-            except:
-                TypeError(f'Incorrect data type on row:\n{row}')
-    return prices
+    prices = parse_csv(filename, types=[str, float], has_headers=False)
+    prices_dict = { price[0]: price[1] for price in prices }
+    return prices_dict
 
 
 def compute_portfolio(portfolio, prices):
@@ -94,5 +66,15 @@ def portfolio_report(portfolio_file, prices_file):
     print_report(portfolio, prices)
 
 
-portfolio_report('Data/portfolio.csv',
-                 'Data/prices.csv')
+def main(argv):
+    if len(argv) != 3:
+        raise SystemExit(f'Usage: {argv[0]} ' 'portfolio file, prices file')
+    portfolio_report(argv[1], argv[2])
+    # portfolio_report('Data/portfolio.csv',
+    #                 'Data/prices.csv')
+
+if __name__ == '__main__':
+    import sys
+    main(sys.argv)
+
+
